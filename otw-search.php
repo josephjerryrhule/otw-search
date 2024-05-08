@@ -3,7 +3,7 @@
 /**
  * Plugin Name: OTW Search Elementor
  * Author: OTW Design
- * Version: 0.1.0
+ * Version: 0.1.1
  * text-domain: otwsearch
  * 
  * @package otwsearch
@@ -32,6 +32,7 @@ final class otw_search
   public function __construct()
   {
     add_action('elementor/init', [$this, 'init']);
+    register_activation_hook(__FILE__, [$this, 'plugin_activation']);
   }
 
   public function init()
@@ -138,6 +139,32 @@ final class otw_search
     echo $output;
 
     wp_die();
+  }
+
+  // Function to add indexes to WooCommerce database tables
+  public function add_custom_indexes()
+  {
+    global $wpdb;
+
+    // Add index to wp_posts table for product titles
+    $wpdb->query("ALTER TABLE {$wpdb->posts} ADD INDEX idx_product_title (post_title)");
+
+    // Add index to wp_posts table for product SKUs
+    $wpdb->query("ALTER TABLE {$wpdb->posts} ADD INDEX idx_product_sku (post_excerpt)");
+
+    // Add index to wp_terms table for term names
+    $wpdb->query("ALTER TABLE {$wpdb->terms} ADD INDEX idx_term_name (name)");
+
+    // Add index to wp_term_taxonomy table for term taxonomy
+    $wpdb->query("ALTER TABLE {$wpdb->term_taxonomy} ADD INDEX idx_term_taxonomy (taxonomy)");
+
+    // Add more indexes as needed for other fields or tables
+  }
+
+  // Function to run on plugin activation
+  public function plugin_activation()
+  {
+    $this->add_custom_indexes();
   }
 }
 
