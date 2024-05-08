@@ -195,6 +195,8 @@ class search extends Widget_Base
             <span class="otw-search-results-title">
               <?php echo __('Best Selling', 'otwsearch'); ?>
             </span>
+
+            <?php echo do_shortcode('[' . $shortcode . ']'); ?>
           </div>
           <!-- End of Shortcode Area -->
 
