@@ -10,6 +10,9 @@ jQuery(document).ready(function ($) {
   $('.otw-search-input-container input[type="search"]').on(
     "input",
     function () {
+      // Show loading indicator
+      $(".otw-search-results-container").addClass("loading");
+
       var searchTerm = $(this).val();
       $.ajax({
         url: ajax_data.ajax_url, // WordPress AJAX URL
@@ -19,9 +22,11 @@ jQuery(document).ready(function ($) {
           search_term: searchTerm,
         },
         success: function (response) {
+          // Hide loading indicator
+          $(".otw-search-results-container").removeClass("loading");
+
           // Update categories and products area with the AJAX response
           $(".otw-search-results-container").html(response);
-          console.log(response); // Log the response data
         },
         error: function (error) {
           console.log(error);
