@@ -15,6 +15,7 @@
   transition: all 0.3s ease-in-out;
   overflow-y: scroll;
 }
+
 .otw-search-content-container {
   max-width: 1440px;
   width: 100%;
@@ -46,13 +47,13 @@
   transform: translate(-50%, -50%);
   z-index: 1;
 }
+
 @keyframes l4 {
   to {
     width: 25px;
     aspect-ratio: 1;
   }
 }
-
 .otw-search-results-container.loading:after {
   content: "";
   background-color: rgba(255, 255, 255, 0.1);
@@ -67,6 +68,7 @@
   top: 20px;
   z-index: 1;
 }
+
 .otw-search-input-container {
   display: flex;
   align-items: center;
@@ -76,6 +78,7 @@
   width: 400px;
   padding: 10px 5px;
 }
+
 .otw-search-input-container input {
   width: 100%;
   outline: none;
@@ -86,6 +89,7 @@
 .otw-search-input-container input:focus {
   box-shadow: none;
 }
+
 .otw-search-results-container {
   width: 100%;
   display: flex;
@@ -420,7 +424,6 @@
     outline: none;
     color: #000;
   }
-
   .otw-search-results-container {
     width: 100%;
     display: flex;
@@ -456,6 +459,11 @@
     align-items: center;
     flex-direction: column;
     gap: 10px;
+  }
+  .otw-search-results-product-item a .otwsearch-products-buynow-area {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
   .otw-search-results-product-item a img {
     max-width: 100px !important;
