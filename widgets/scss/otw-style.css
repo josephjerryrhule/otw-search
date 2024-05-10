@@ -100,6 +100,7 @@
   position: relative;
   max-height: calc(100% - 15px);
   overflow-y: auto;
+  height: 100%;
 }
 
 .otw-search-results-container::-webkit-scrollbar {
@@ -130,6 +131,7 @@
 }
 
 .otw-search-results-products-area {
+  flex: 1 0 60%;
   max-width: 60%;
 }
 
@@ -182,6 +184,11 @@
 
 .otw-search-results-products-area .otw-search-results-products-area-content {
   flex: 1 0 50%;
+}
+
+.otw-search-results-best-seller-area .otw-search-results-products-area-content {
+  flex: 1 0 25%;
+  max-width: 25%;
 }
 
 .otw-search-results-product-item {
