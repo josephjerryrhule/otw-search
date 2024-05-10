@@ -254,6 +254,7 @@ class search extends Widget_Base
 
         </div>
       </div>
-  <?php
+    </div>
+<?php
   }
 }
