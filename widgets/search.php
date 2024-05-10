@@ -174,25 +174,18 @@ class search extends Widget_Base
                       <?php
                       echo $product->get_image();
                       ?>
-                      <div class="otwsearch-products-buynow-area">
-                        <span><?php echo $product->get_name(); ?></span>
-                        <span>
-                          <?php echo __('Buy Now', 'otwsearch'); ?>
-                        </span>
+                      <div class="otw-search-results-product-item-content">
+                        <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                        <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
                       </div>
                     </a>
-
-                    <div class="otwsearch-product-results-hover-info">
-                      <a href="<?php echo $product->get_permalink(); ?>">
-                        <?php
-                        echo $product->get_image();
-                        ?>
-                        <div class="otwsearch-products-buynow-area">
-                          <span><?php echo $product->get_name(); ?></span>
-                          <span class="product-sku"><?php echo __('SKU: ', 'otwsearch') . $product->get_sku(); ?></span>
-                          <span class="product-price"><?php echo wc_price($product->get_price()); ?></span>
-                        </div>
-                      </a>
+                    <div class="otw-search-results-product-item-popup">
+                      <?php echo $product->get_image(); ?>
+                      <div class="otw-search-results-product-item-content">
+                        <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                        <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                      </div>
+                      <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>">Buy Now</a>
                     </div>
                   </div>
               <?php
@@ -211,21 +204,56 @@ class search extends Widget_Base
           <!-- End of Products Area -->
 
           <!-- Shortcode Area -->
-          <div class="otw-search-results-shortcode-area">
+          <div class="otw-search-best-seller-area">
             <span class="otw-search-results-title">
-              <?php echo __('Best Selling', 'otwsearch'); ?>
+              <?php echo __('Best Sellers', 'otwsearch'); ?>
             </span>
 
-            <?php echo do_shortcode('[' . $shortcode . ']'); ?>
-          </div>
-          <!-- End of Shortcode Area -->
+            <div class="otw-search-results-products-area-content">
+              <?php
+              // Fetch WooCommerce products
+              $products = wc_get_products([
+                'status' => 'publish',
+                'limit' => 6, // Limit to 6 products
+                'orderby' => 'meta_value_num',
+                'order' => 'DESC',
+                'meta_key' => 'total_sales', // Sort by total sales
+              ]);
+              if (!empty($products) && !is_wp_error($products)) :
+                foreach ($products as $product) :
+              ?>
+                  <div class="otw-search-results-product-item">
+                    <a href="<?php echo $product->get_permalink(); ?>">
+                      <?php
+                      echo $product->get_image();
+                      ?>
+                      <div class="otw-search-results-product-item-content">
+                        <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                        <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                      </div>
+                    </a>
+                    <div class="otw-search-results-product-item-popup">
+                      <?php echo $product->get_image(); ?>
+                      <div class="otw-search-results-product-item-content">
+                        <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                        <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                      </div>
+                      <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>">Buy Now</a>
+                    </div>
+                  </div>
+              <?php
+                endforeach;
+              endif;
+              ?>
+            </div>
+            <!-- End of Shortcode Area -->
 
+
+          </div>
+          <!-- End of Results Container -->
 
         </div>
-        <!-- End of Results Container -->
-
       </div>
-    </div>
-<?php
+  <?php
   }
 }
