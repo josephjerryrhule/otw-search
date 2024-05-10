@@ -62,12 +62,21 @@ class search extends Widget_Base
     );
 
     $this->add_control(
-      'shortcode',
+      'placeholder',
       [
-        'label' => __('Shortcode', 'otwsearch'),
+        'label' => __('Placeholder', 'otwsearch'),
         'type' => \Elementor\Controls_Manager::TEXT,
-        'placeholder' => __('Add Shortcode here', 'otwsearch'),
-        'default' => __('Add Shortcode here', 'otwsearch'),
+        'placeholder' => __('Add Placeholder here', 'otwsearch'),
+        'default' => __('Add Placeholder here', 'otwsearch'),
+      ]
+    );
+
+    $this->add_control(
+      'color',
+      [
+        'label' => __('Accent Color', 'otwsearch'),
+        'type' => \Elementor\Controls_Manager::COLOR,
+        'default' => '#333',
       ]
     );
 
@@ -77,8 +86,15 @@ class search extends Widget_Base
   protected function render()
   {
     $settings = $this->get_settings_for_display();
-    $shortcode = $settings['shortcode'];
+    $placeholder = $settings['placeholder'];
+    $color = $settings['color'];
 ?>
+    <style>
+      * {
+        --e-global-otw-color-accent: <?php echo $color; ?>
+      }
+    </style>
+
 
     <span class="otw-search-icon">
       <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -112,7 +128,7 @@ class search extends Widget_Base
               </g>
             </svg>
           </span>
-          <input type="search" name="" id="" placeholder="<?php echo __('Search for products or categories...', 'otwsearch'); ?>">
+          <input type="search" name="" id="" placeholder="<?php echo __($placeholder, 'otwsearch'); ?>">
         </div>
 
         <!-- Results Container -->
@@ -177,6 +193,7 @@ class search extends Widget_Base
                       <div class="otw-search-results-product-item-content">
                         <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
                         <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                        <span class="otw-search-results-product-item-link desktop-hidden" href="<?php echo $product->get_permalink(); ?>">Buy Now</span>
                       </div>
                     </a>
                     <div class="otw-search-results-product-item-popup">
