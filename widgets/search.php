@@ -127,7 +127,7 @@ class search extends Widget_Base
             <?php
             $categories = get_terms('product_cat', [
               'hide_empty' => false,
-              'number'     => 4, // Limit to 4 categories
+              'number'     => 12, // Limit to 4 categories
             ]);
 
             if (!empty($categories) && !is_wp_error($categories)) :
@@ -154,14 +154,16 @@ class search extends Widget_Base
 
           <!-- Products Area -->
           <div class="otw-search-results-products-area">
-
+            <span class="otw-search-results-title">
+              <?php echo __('Products', 'otwsearch'); ?>
+            </span>
             <div class="otw-search-results-products-area-content">
               <?php
 
               // Fetch WooCommerce products
               $products = wc_get_products([
                 'status'     => 'publish',
-                'limit'      => 4, // Limit to 8 products
+                'limit'      => 12, // Limit to 8 products
               ]);
 
               if (!empty($products) && !is_wp_error($products)) :
@@ -172,7 +174,12 @@ class search extends Widget_Base
                       <?php
                       echo $product->get_image();
                       ?>
-                      <span><?php echo $product->get_name(); ?></span>
+                      <div class="otwsearch-products-buynow-area">
+                        <span><?php echo $product->get_name(); ?></span>
+                        <span>
+                          <?php echo __('Buy Now', 'otwsearch'); ?>
+                        </span>
+                      </div>
                     </a>
                   </div>
               <?php

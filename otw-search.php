@@ -68,24 +68,24 @@ final class otw_search
   public function custom_search_callback()
   {
     $search_term = sanitize_text_field($_POST['search_term']);
+    // Count the total number of products matching the search term
+    $total_products_count = $this->get_total_product_count($search_term);
+
 
     // Fetch WooCommerce products with search term filter
     $products = wc_get_products(array(
       'status'     => 'publish',
-      'limit'      => 4, // Retrieve all matching products
+      'limit'      => 12, // Retrieve all matching products
       's'          => $search_term, // Search term filter
     ));
 
     // Fetch product categories associated with the matching products
-    $categories = array();
-    foreach ($products as $product) {
-      $product_categories = wp_get_post_terms($product->get_id(), 'product_cat');
-      foreach ($product_categories as $product_category) {
-        if (!in_array($product_category, $categories)) {
-          $categories[] = $product_category;
-        }
-      }
-    }
+    // Fetch WooCommerce product categories with search term filter
+    $categories = get_terms('product_cat', array(
+      'hide_empty' => false,
+      'number'     => 12, // Limit to 4 categories
+      'search'     => $search_term, // Search term filter
+    ));
 
     // Output HTML for categories and products
     ob_start();
@@ -103,6 +103,8 @@ final class otw_search
         </ul>
       </div>
     <?php
+    else :
+      echo __('No Category found with search term', 'otwsearch');
     endif;
 
     // Output HTML for products
@@ -110,6 +112,9 @@ final class otw_search
     ?>
       <!-- Products Area -->
       <div class="otw-search-results-products-area">
+        <span class="otw-search-results-title">
+          <?php echo __('Products', 'otwsearch'); ?>
+        </span>
         <div class="otw-search-results-products-area-content">
           <?php foreach ($products as $product) : ?>
             <div class="otw-search-results-product-item">
@@ -120,8 +125,16 @@ final class otw_search
             </div>
           <?php endforeach; ?>
         </div>
+        <?php
+        // Output HTML for "View all products" link with the total product count
+        echo '<a href="' . home_url('/?s=' . $search_term . '&post_type=product&dgwt_wcas=1') . '" class="text-center">';
+        printf(_n('View all product (%s)', 'View all products (%s)', $total_products_count, 'otwsearch'), number_format_i18n($total_products_count));
+        echo '</a>';
+        ?>
       </div>
     <?php
+    else :
+      echo __('No Products Found', 'otwsearch');
     endif;
     ?>
     <!-- Shortcode Area -->
@@ -139,6 +152,22 @@ final class otw_search
     echo $output;
 
     wp_die();
+  }
+
+  // Function to retrieve the total count of products matching the search term
+  private function get_total_product_count($search_term)
+  {
+    $args = array(
+      'status'     => 'publish',
+      's'          => $search_term, // Search term filter
+      'return'     => 'ids', // Return only product IDs
+    );
+
+    // Fetch WooCommerce products with search term filter and return only IDs
+    $product_ids = wc_get_products($args);
+
+    // Return the count of retrieved product IDs
+    return count($product_ids);
   }
 
   // Function to add indexes to WooCommerce database tables
