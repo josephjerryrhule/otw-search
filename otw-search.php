@@ -127,6 +127,19 @@ final class otw_search
                   </span>
                 </div>
               </a>
+
+              <div class="otwsearch-product-results-hover-info">
+                <a href="<?php echo $product->get_permalink(); ?>">
+                  <?php
+                  echo $product->get_image();
+                  ?>
+                  <div class="otwsearch-products-buynow-area">
+                    <span><?php echo $product->get_name(); ?></span>
+                    <span class="product-sku"><?php echo __('SKU: ', 'otwsearch') . $product->get_sku(); ?></span>
+                    <span class="product-price"><?php echo wc_price($product->get_price()); ?></span>
+                  </div>
+                </a>
+              </div>
             </div>
           <?php endforeach; ?>
         </div>
