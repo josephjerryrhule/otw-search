@@ -17,6 +17,15 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+if (!function_exists('get_recently_viewed_product_ids')) {
+  function get_recently_viewed_product_ids()
+  {
+    // Your code to retrieve recently viewed product IDs
+    $recently_viewed = isset($_COOKIE['recently_viewed']) ? json_decode($_COOKIE['recently_viewed'], true) : array();
+    return $recently_viewed;
+  }
+}
+
 final class otw_search
 {
   private static $_instance = null;
@@ -94,7 +103,7 @@ final class otw_search
     if (!empty($categories)) :
 ?>
       <!-- Categories Area -->
-      <div class="otw-search-results-category-area">
+      <div class="otw-search-results-category-area" style="--col-width:15%;">
         <span class="otw-search-results-title"><?php echo __('Categories', 'otwsearch'); ?></span>
         <ul>
           <?php foreach ($categories as $category) : ?>
@@ -118,11 +127,11 @@ final class otw_search
     if (!empty($products) && !is_wp_error($products)) :
     ?>
       <!-- Products Area -->
-      <div class="otw-search-results-products-area">
+      <div class="otw-search-results-products-area" style="--col-width:35%;">
         <span class="otw-search-results-title">
           <?php echo __('Products', 'otwsearch'); ?>
         </span>
-        <div class="otw-search-results-products-area-content">
+        <div class="otw-search-results-products-area-content product">
           <?php foreach ($products as $product) : ?>
             <div class="otw-search-results-product-item">
               <a href="<?php echo $product->get_permalink(); ?>">
@@ -157,8 +166,8 @@ final class otw_search
       echo __('No Products Found', 'otwsearch');
     endif;
     ?>
-    <!-- Shortcode Area -->
-    <div class="otw-search-best-seller-area">
+    <!-- Best Seller Area -->
+    <div class="otw-search-best-seller-area" style="--col-width:25%;">
       <span class="otw-search-results-title">
         <?php echo __('Best Sellers', 'otwsearch'); ?>
       </span>
@@ -200,9 +209,56 @@ final class otw_search
         endif;
         ?>
       </div>
-      <!-- End of Shortcode Area -->
+    </div>
+    <!-- End of Best Seller Area -->
 
-  <?php
+    <!-- Recently Viewed -->
+    <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:25%;">
+      <span class="otw-search-results-title"><?php echo __('Recently Viewed', 'otwsearch'); ?></span>
+
+      <div class="otw-search-results-products-area-content">
+        <?php
+
+        // Fetch recently viewed product IDs
+        $recently_viewed = get_recently_viewed_product_ids();
+
+        $recently_viewed_products = wc_get_products([
+          'include' => $recently_viewed,
+          'limit' => 6, // Limit to 6 products
+        ]);
+
+        // Fetch recently viewed products
+        if (!empty($recently_viewed_products) && !is_wp_error($recently_viewed_products)) :
+          foreach ($recently_viewed_products as $product) :
+        ?>
+            <div class="otw-search-results-product-item">
+              <a href="<?php echo $product->get_permalink(); ?>">
+                <?php
+                echo $product->get_image();
+                ?>
+                <div class="otw-search-results-product-item-content">
+                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                </div>
+              </a>
+              <div class="otw-search-results-product-item-popup">
+                <?php echo $product->get_image(); ?>
+                <div class="otw-search-results-product-item-content">
+                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                </div>
+                <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>">Buy Now</a>
+              </div>
+            </div>
+        <?php
+          endforeach;
+        endif;
+        ?>
+      </div>
+    </div>
+    <!-- End of Recently Viewed -->
+
+<?php
 
     // Output HTML
     $output = ob_get_clean();
@@ -251,6 +307,35 @@ final class otw_search
   public function plugin_activation()
   {
     $this->add_custom_indexes();
+  }
+
+  // Function to add product ID to recently viewed products cookie
+  public function add_to_recently_viewed($product_id)
+  {
+    if (!defined('DAY_IN_SECONDS')) {
+      define('DAY_IN_SECONDS', 86400);
+    }
+
+    if (!defined('COOKIEPATH')) {
+      define('COOKIEPATH', '/');
+    }
+
+    if (!defined('COOKIE_DOMAIN')) {
+      define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
+    }
+
+    $recently_viewed = isset($_COOKIE['recently_viewed']) ? json_decode($_COOKIE['recently_viewed'], true) : array();
+
+    // Add the product ID to the recently viewed array
+    if (!in_array($product_id, $recently_viewed)) {
+      $recently_viewed[] = $product_id;
+    }
+
+    // Limit recently viewed products to 6
+    $recently_viewed = array_slice($recently_viewed, -6);
+
+    // Store the recently viewed products in a cookie for 30 days
+    setcookie('recently_viewed', json_encode($recently_viewed), time() + 30 * DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN);
   }
 }
 

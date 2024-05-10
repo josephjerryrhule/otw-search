@@ -35,3 +35,27 @@ jQuery(document).ready(function ($) {
     }
   );
 });
+
+jQuery(document).ready(function ($) {
+  // Function to add product to recently viewed
+  function addToRecentlyViewed(productId) {
+    var recentlyViewed = getRecentlyViewed(); // Retrieve recently viewed products from localStorage
+    if (!recentlyViewed.includes(productId)) {
+      recentlyViewed.push(productId); // Add product ID to recently viewed
+      localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewed)); // Save updated recently viewed list to localStorage
+    }
+  }
+
+  // Function to retrieve recently viewed products from localStorage
+  function getRecentlyViewed() {
+    var recentlyViewed = localStorage.getItem("recentlyViewed");
+    return recentlyViewed ? JSON.parse(recentlyViewed) : []; // Parse JSON string to array
+  }
+
+  // Example: Listen for click events on product links and add them to recently viewed
+  $(".product").on("click", function (e) {
+    e.preventDefault();
+    var productId = $(this).data("product-id"); // Get product ID from data attribute
+    addToRecentlyViewed(productId); // Add product to recently viewed
+  });
+});
