@@ -191,6 +191,27 @@
 .otw-search-results-products-area .otw-search-results-product-item {
   max-width: 40%;
   flex: 1 0 40%;
+  position: relative;
+}
+.otw-search-results-products-area
+  .otw-search-results-product-item:hover
+  .otwsearch-product-results-hover-info {
+  opacity: 1;
+  transform: translateY(0%);
+  z-index: 2;
+}
+.otw-search-results-products-area
+  .otw-search-results-product-item
+  .otwsearch-product-results-hover-info {
+  background: white;
+  padding: 20px;
+  position: absolute;
+  opacity: 0;
+  transform: translateY(-5%);
+  transition: all 0.3s ease-in-out;
+  width: 200px;
+  height: 200px;
+  z-index: 0;
 }
 
 .otw-search-results-product-item a {
