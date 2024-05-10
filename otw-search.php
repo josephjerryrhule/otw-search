@@ -3,7 +3,7 @@
 /**
  * Plugin Name: OTW Search Elementor
  * Author: OTW Design
- * Version: 0.1.1
+ * Version: 0.1.2
  * text-domain: otwsearch
  * 
  * @package otwsearch
