@@ -120,7 +120,12 @@ final class otw_search
             <div class="otw-search-results-product-item">
               <a href="<?php echo $product->get_permalink(); ?>">
                 <?php echo $product->get_image(); ?>
-                <span><?php echo $product->get_name(); ?></span>
+                <div class="otwsearch-products-buynow-area">
+                  <span><?php echo $product->get_name(); ?></span>
+                  <span>
+                    <?php echo __('Buy Now', 'otwsearch'); ?>
+                  </span>
+                </div>
               </a>
             </div>
           <?php endforeach; ?>
