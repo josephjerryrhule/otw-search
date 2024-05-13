@@ -43,6 +43,8 @@ final class otw_search
     add_action('wp_ajax_nopriv_custom_search_action', [$this, 'custom_search_callback']);
 
 
+    // Hook into WooCommerce to add product to recently viewed when product page is loaded
+    add_action('woocommerce_before_single_product', array($this, 'add_product_to_recently_viewed'));
     add_action('wp_ajax_get_recently_viewed_products', [$this, 'get_recently_viewed_products']);
     add_action('wp_ajax_nopriv_get_recently_viewed_products', [$this, 'get_recently_viewed_products']);
   }
@@ -304,6 +306,44 @@ final class otw_search
   public function plugin_activation()
   {
     $this->add_custom_indexes();
+  }
+
+  // Function to add product to recently viewed
+  public function add_product_to_recently_viewed()
+  {
+    if (is_product()) {
+      $product_id = get_the_ID(); // Get the product ID
+      $this->add_to_recently_viewed($product_id); // Add product to recently viewed
+    }
+  }
+
+  // Function to add product ID to recently viewed products cookie
+  public function add_to_recently_viewed($product_id)
+  {
+    if (!defined('DAY_IN_SECONDS')) {
+      define('DAY_IN_SECONDS', 86400);
+    }
+
+    if (!defined('COOKIEPATH')) {
+      define('COOKIEPATH', '/');
+    }
+
+    if (!defined('COOKIE_DOMAIN')) {
+      define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
+    }
+
+    $recently_viewed = isset($_COOKIE['recently_viewed']) ? json_decode(stripslashes($_COOKIE['recently_viewed']), true) : array();
+
+    // Add the product ID to the recently viewed array
+    if (!in_array($product_id, $recently_viewed)) {
+      $recently_viewed[] = $product_id;
+    }
+
+    // Limit recently viewed products to 6
+    $recently_viewed = array_slice($recently_viewed, -6);
+
+    // Store the recently viewed products in a cookie for 30 days
+    setcookie('recently_viewed', json_encode($recently_viewed), time() + 30 * DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN);
   }
 
   private function get_recently_viewed_product_ids()
