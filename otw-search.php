@@ -78,12 +78,22 @@ final class otw_search
     $total_products_count = $this->get_total_product_count($search_term);
 
 
-    // Fetch WooCommerce products with search term filter
-    $products = wc_get_products(array(
+    $args = array(
       'status'     => 'publish',
-      'limit'      => 12, // Retrieve all matching products
-      's'          => $search_term, // Search term filter
-    ));
+      'limit'      => 12, // Limit to 12 products
+      's'          => $search_term, // Search term
+      'meta_query' => array(
+        'relation' => 'OR',
+        array(
+          'key'     => '_sku',
+          'value'   => $search_term,
+          'compare' => 'LIKE',
+        ),
+      ),
+    );
+
+    // Fetch WooCommerce products with search term filter and SKU search
+    $products = wc_get_products($args);
 
     // Fetch product categories associated with the matching products
     // Fetch WooCommerce product categories with search term filter
@@ -160,7 +170,16 @@ final class otw_search
       </div>
     <?php
     else :
-      echo __('No Products Found', 'otwsearch');
+    ?>
+      <div class="otw-search-results-products-area" style="--col-width:35%;">
+        <span class="otw-search-results-title">
+          <?php echo __('Products', 'otwsearch'); ?>
+        </span>
+        <?php
+        echo __('No Products Found', 'otwsearch');
+        ?>
+      </div>
+    <?php
     endif;
     ?>
     <!-- Best Seller Area -->
