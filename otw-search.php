@@ -89,6 +89,11 @@ final class otw_search
           'value'   => $search_term,
           'compare' => 'LIKE',
         ),
+        array(
+          'key' => '_product_name',
+          'value' => $search_term,
+          'compare' => 'LIKE',
+        ),
       ),
     );
 
