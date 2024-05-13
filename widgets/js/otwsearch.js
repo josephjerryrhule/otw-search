@@ -39,17 +39,21 @@ jQuery(document).ready(function ($) {
 jQuery(document).ready(function ($) {
   // Function to add product to recently viewed
   function addToRecentlyViewed(productId) {
-    var recentlyViewed = getRecentlyViewed(); // Retrieve recently viewed products from localStorage
-    if (!recentlyViewed.includes(productId)) {
-      recentlyViewed.push(productId); // Add product ID to recently viewed
-      localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewed)); // Save updated recently viewed list to localStorage
-    }
-  }
-
-  // Function to retrieve recently viewed products from localStorage
-  function getRecentlyViewed() {
-    var recentlyViewed = localStorage.getItem("recentlyViewed");
-    return recentlyViewed ? JSON.parse(recentlyViewed) : []; // Parse JSON string to array
+    // AJAX request to add product to recently viewed
+    $.ajax({
+      url: ajax_data.ajax_url, // WordPress AJAX URL
+      type: "POST",
+      data: {
+        action: "add_to_recently_viewed", // AJAX action hook
+        product_id: productId, // Product ID to add
+      },
+      success: function (response) {
+        console.log("Product added to recently viewed:", productId);
+      },
+      error: function (error) {
+        console.error("Error adding product to recently viewed:", error);
+      },
+    });
   }
 
   // Example: Listen for click events on product links and add them to recently viewed
@@ -58,4 +62,41 @@ jQuery(document).ready(function ($) {
     var productId = $(this).data("product-id"); // Get product ID from data attribute
     addToRecentlyViewed(productId); // Add product to recently viewed
   });
+});
+
+jQuery(document).ready(function ($) {
+  // Function to fetch recently viewed products via AJAX
+  function fetchRecentlyViewedProducts() {
+    $.ajax({
+      url: ajax_data.ajax_url,
+      type: "POST",
+      data: {
+        action: "get_recently_viewed_products",
+      },
+      success: function (response) {
+        if (response.success) {
+          // Handle the response data (recently viewed products HTML)
+          var recentlyViewedProductsHtml = response.data;
+          // Display the recently viewed products HTML on the page
+          displayRecentlyViewedProducts(recentlyViewedProductsHtml);
+        } else {
+          console.error("Error fetching recently viewed products");
+        }
+      },
+      error: function (error) {
+        console.error("Error fetching recently viewed products:", error);
+      },
+    });
+  }
+
+  // Function to display recently viewed products HTML on the page
+  function displayRecentlyViewedProducts(recentlyViewedProductsHtml) {
+    // Display the HTML markup in the recently viewed container
+    $(
+      ".otw-search-recently-viewed-area .otw-search-results-products-area-content"
+    ).html(recentlyViewedProductsHtml);
+  }
+
+  // Fetch recently viewed products when the page loads
+  fetchRecentlyViewedProducts();
 });

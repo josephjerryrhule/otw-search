@@ -17,15 +17,6 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-if (!function_exists('get_recently_viewed_product_ids')) {
-  function get_recently_viewed_product_ids()
-  {
-    // Your code to retrieve recently viewed product IDs
-    $recently_viewed = isset($_COOKIE['recently_viewed']) ? json_decode($_COOKIE['recently_viewed'], true) : array();
-    return $recently_viewed;
-  }
-}
-
 final class otw_search
 {
   private static $_instance = null;
@@ -50,6 +41,10 @@ final class otw_search
     add_action('elementor/widgets/register', [$this, 'init_widgets']);
     add_action('wp_ajax_custom_search_action', [$this, 'custom_search_callback']);
     add_action('wp_ajax_nopriv_custom_search_action', [$this, 'custom_search_callback']);
+
+
+    add_action('wp_ajax_get_recently_viewed_products', [$this, 'get_recently_viewed_products']);
+    add_action('wp_ajax_nopriv_get_recently_viewed_products', [$this, 'get_recently_viewed_products']);
   }
 
   public function create_new_category($elements_manager)
@@ -213,29 +208,27 @@ final class otw_search
     <!-- End of Best Seller Area -->
 
     <!-- Recently Viewed -->
+    <?php
+    // Fetch recently viewed product IDs
+    $recently_viewed = $this->get_recently_viewed_product_ids();
+
+    // Fetch recently viewed products
+    $recently_viewed_products = wc_get_products(array(
+      'include' => $recently_viewed,
+      'limit' => 6, // Limit to 6 products
+    ));
+    ?>
     <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:25%;">
       <span class="otw-search-results-title"><?php echo __('Recently Viewed', 'otwsearch'); ?></span>
 
-      <div class="otw-search-results-products-area-content">
-        <?php
-
-        // Fetch recently viewed product IDs
-        $recently_viewed = get_recently_viewed_product_ids();
-
-        $recently_viewed_products = wc_get_products([
-          'include' => $recently_viewed,
-          'limit' => 6, // Limit to 6 products
-        ]);
-
-        // Fetch recently viewed products
-        if (!empty($recently_viewed_products) && !is_wp_error($recently_viewed_products)) :
-          foreach ($recently_viewed_products as $product) :
-        ?>
+      <?php
+      if (!empty($recently_viewed_products) && !is_wp_error($recently_viewed_products)) :
+      ?>
+        <div class="otw-search-results-products-area-content">
+          <?php foreach ($recently_viewed_products as $product) : ?>
             <div class="otw-search-results-product-item">
               <a href="<?php echo $product->get_permalink(); ?>">
-                <?php
-                echo $product->get_image();
-                ?>
+                <?php echo $product->get_image(); ?>
                 <div class="otw-search-results-product-item-content">
                   <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
                   <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
@@ -250,11 +243,15 @@ final class otw_search
                 <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>">Buy Now</a>
               </div>
             </div>
-        <?php
-          endforeach;
-        endif;
-        ?>
-      </div>
+          <?php endforeach; ?>
+        </div>
+      <?php
+      else :
+        echo __('No Products Found', 'otwsearch');
+      endif;
+
+      ?>
+
     </div>
     <!-- End of Recently Viewed -->
 
@@ -309,33 +306,51 @@ final class otw_search
     $this->add_custom_indexes();
   }
 
-  // Function to add product ID to recently viewed products cookie
-  public function add_to_recently_viewed($product_id)
+  private function get_recently_viewed_product_ids()
   {
-    if (!defined('DAY_IN_SECONDS')) {
-      define('DAY_IN_SECONDS', 86400);
+    $recently_viewed = isset($_COOKIE['recently_viewed']) ? json_decode(stripslashes($_COOKIE['recently_viewed']), true) : array();
+    return $recently_viewed;
+  }
+
+
+  public function get_recently_viewed_products()
+  {
+
+    $recently_viewed_ids = isset($_COOKIE['recently_viewed']) ? json_decode(stripslashes($_COOKIE['recently_viewed']), true) : array();
+
+    // Fetch recently viewed products based on their IDs
+    $recently_viewed_products = wc_get_products(array(
+      'include' => $recently_viewed_ids,
+      'limit' => -1,
+    ));
+
+    // Initialize an empty string to store the HTML markup
+    $recently_viewed_html = '';
+
+    // Loop through the recently viewed products and generate HTML markup for each product
+    foreach ($recently_viewed_products as $product) {
+      // Generate HTML markup for the product
+      $recently_viewed_html .= '<div class="otw-search-results-product-item">';
+      $recently_viewed_html .= '<a href="' . $product->get_permalink() . '">';
+      $recently_viewed_html .= $product->get_image();
+      $recently_viewed_html .= '<div class="otw-search-results-product-item-content">';
+      $recently_viewed_html .= '<span class="otw-search-results-product-item-title">' . $product->get_name() . '</span>';
+      $recently_viewed_html .= '<span class="otw-search-results-product-item-price">' . $product->get_price_html() . '</span>';
+      $recently_viewed_html .= '<span class="otw-search-results-product-item-link desktop-hidden">' . __('Buy Now', 'otwsearch') . '</span>';
+      $recently_viewed_html .= '</div></a>';
+      $recently_viewed_html .= '<div class="otw-search-results-product-item-popup">';
+      $recently_viewed_html .= $product->get_image();
+      $recently_viewed_html .= '<div class="otw-search-results-product-item-content">';
+      $recently_viewed_html .= '<span class="otw-search-results-product-item-title">' . $product->get_name() . '</span>';
+      $recently_viewed_html .= '<span class="otw-search-results-product-item-price">' . $product->get_price_html() . '</span>';
+      $recently_viewed_html .= '</div>';
+      $recently_viewed_html .= '<a class="otw-search-results-product-item-link" href="' . $product->get_permalink() . '">' . __('Buy Now', 'otwsearch') . '</a>';
+      $recently_viewed_html .= '</div>';
+      $recently_viewed_html .= '</div>';
     }
 
-    if (!defined('COOKIEPATH')) {
-      define('COOKIEPATH', '/');
-    }
-
-    if (!defined('COOKIE_DOMAIN')) {
-      define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
-    }
-
-    $recently_viewed = isset($_COOKIE['recently_viewed']) ? json_decode($_COOKIE['recently_viewed'], true) : array();
-
-    // Add the product ID to the recently viewed array
-    if (!in_array($product_id, $recently_viewed)) {
-      $recently_viewed[] = $product_id;
-    }
-
-    // Limit recently viewed products to 6
-    $recently_viewed = array_slice($recently_viewed, -6);
-
-    // Store the recently viewed products in a cookie for 30 days
-    setcookie('recently_viewed', json_encode($recently_viewed), time() + 30 * DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN);
+    // Send the HTML markup as a success response
+    wp_send_json_success($recently_viewed_html);
   }
 }
 

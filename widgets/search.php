@@ -347,43 +347,7 @@ class search extends Widget_Base
               <span class="otw-search-results-title"><?php echo __('Recently Viewed', 'otwsearch'); ?></span>
 
               <div class="otw-search-results-products-area-content">
-                <?php
 
-                // Fetch recently viewed product IDs
-                $recently_viewed = get_recently_viewed_product_ids();
-
-                $recently_viewed_products = wc_get_products([
-                  'include' => $recently_viewed,
-                  'limit' => 6, // Limit to 6 products
-                ]);
-
-                // Fetch recently viewed products
-                if (!empty($recently_viewed_products) && !is_wp_error($recently_viewed_products)) :
-                  foreach ($recently_viewed_products as $product) :
-                ?>
-                    <div class="otw-search-results-product-item">
-                      <a href="<?php echo $product->get_permalink(); ?>">
-                        <?php
-                        echo $product->get_image();
-                        ?>
-                        <div class="otw-search-results-product-item-content">
-                          <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                          <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                        </div>
-                      </a>
-                      <div class="otw-search-results-product-item-popup">
-                        <?php echo $product->get_image(); ?>
-                        <div class="otw-search-results-product-item-content">
-                          <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                          <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                        </div>
-                        <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>">Buy Now</a>
-                      </div>
-                    </div>
-                <?php
-                  endforeach;
-                endif;
-                ?>
               </div>
             </div>
           <?php
