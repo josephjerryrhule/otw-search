@@ -258,7 +258,7 @@ class search extends Widget_Base
                         <div class="otw-search-results-product-item-content">
                           <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
                           <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                          <span class="otw-search-results-product-item-link desktop-hidden" href="<?php echo $product->get_permalink(); ?>">Buy Now</span>
+                          <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
                         </div>
                       </a>
                       <div class="otw-search-results-product-item-popup">
@@ -267,7 +267,7 @@ class search extends Widget_Base
                           <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
                           <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
                         </div>
-                        <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>">Buy Now</a>
+                        <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
                       </div>
                     </div>
                 <?php
@@ -318,6 +318,7 @@ class search extends Widget_Base
                         <div class="otw-search-results-product-item-content">
                           <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
                           <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                          <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
                         </div>
                       </a>
                       <div class="otw-search-results-product-item-popup">
@@ -326,7 +327,7 @@ class search extends Widget_Base
                           <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
                           <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
                         </div>
-                        <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>">Buy Now</a>
+                        <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
                       </div>
                     </div>
                 <?php
