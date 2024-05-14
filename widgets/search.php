@@ -138,10 +138,10 @@ class search extends Widget_Base
     $settings = $this->get_settings_for_display();
     $placeholder = $settings['placeholder'];
     $color = $settings['color'];
-    $show_categories = $settings['show_categories'];
-    $show_products = $settings['show_products'];
-    $show_bestselling = $settings['show_bestselling'];
-    $show_recentlyviewed = $settings['show_recentlyviewed'];
+
+    //Store Settings in WordPress options table
+    update_option('otwsearch_settings', $settings);
+
 ?>
     <style>
       .otw-search-parent-container {

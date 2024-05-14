@@ -78,6 +78,16 @@ final class otw_search
     $total_products_count = $this->get_total_product_count($search_term);
 
 
+    //Retrive settings from WordPress options table
+    $settings = get_option('otwsearch_settings');
+
+    // Check if the settings are enabled and display items accordingly
+    $show_categories = $settings['show_categories'];
+    $show_products = $settings['show_products'];
+    $show_bestselling = $settings['show_bestselling'];
+    $show_recentlyviewed = $settings['show_recentlyviewed'];
+
+
     $args = array(
       'status'     => 'publish',
       'limit'      => 12, // Limit to 12 products
@@ -99,181 +109,196 @@ final class otw_search
     ob_start();
 
     // Output HTML for categories
-    if (!empty($categories)) :
+    if ('yes' === $show_categories) :
+      if (!empty($categories)) :
 ?>
-      <!-- Categories Area -->
-      <div class="otw-search-results-category-area" style="--col-width:15%;">
-        <span class="otw-search-results-title"><?php echo __('Categories', 'otwsearch'); ?></span>
-        <ul>
-          <?php foreach ($categories as $category) : ?>
-            <li><a href="<?php echo get_term_link($category); ?>"><?php echo __($category->name, 'otwsearch'); ?></a></li>
-          <?php endforeach; ?>
-        </ul>
-      </div>
-    <?php
-    else :
-    ?>
-      <div class="otw-search-results-category-area">
-        <span class="otw-search-results-title"><?php echo __('Categories', 'otwsearch'); ?></span>
-        <span>
-          <?php echo __('No Category found with search term', 'otwsearch'); ?>
-        </span>
-      </div>
-    <?php
-    endif;
-
-    // Output HTML for products
-    if (!empty($products) && !is_wp_error($products)) :
-    ?>
-      <!-- Products Area -->
-      <div class="otw-search-results-products-area" style="--col-width:35%;">
-        <span class="otw-search-results-title">
-          <?php echo __('Products', 'otwsearch'); ?>
-        </span>
-        <div class="otw-search-results-products-area-content product">
-          <?php foreach ($products as $product) : ?>
-            <div class="otw-search-results-product-item">
-              <a href="<?php echo $product->get_permalink(); ?>">
-                <?php
-                echo $product->get_image();
-                ?>
-                <div class="otw-search-results-product-item-content">
-                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                  <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
-
-                </div>
-              </a>
-              <div class="otw-search-results-product-item-popup">
-                <?php echo $product->get_image(); ?>
-                <div class="otw-search-results-product-item-content">
-                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                </div>
-                <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        </div>
-        <?php
-        // Output HTML for "View all products" link with the total product count
-        echo '<a href="' . home_url('/?s=' . $search_term . '&post_type=product&dgwt_wcas=1') . '" class="text-center">';
-        printf(_n('View all product (%s)', 'View all products (%s)', $total_products_count, 'otwsearch'), number_format_i18n($total_products_count));
-        echo '</a>';
-        ?>
-      </div>
-    <?php
-    else :
-    ?>
-      <div class="otw-search-results-products-area" style="--col-width:35%;">
-        <span class="otw-search-results-title">
-          <?php echo __('Products', 'otwsearch'); ?>
-        </span>
-        <?php
-        echo __('No Products Found', 'otwsearch');
-        ?>
-      </div>
-    <?php
-    endif;
-    ?>
-    <!-- Best Seller Area -->
-    <div class="otw-search-best-seller-area" style="--col-width:25%;">
-      <span class="otw-search-results-title">
-        <?php echo __('Best Sellers', 'otwsearch'); ?>
-      </span>
-
-      <div class="otw-search-results-products-area-content">
-        <?php
-        // Fetch WooCommerce products
-        $products = wc_get_products([
-          'status' => 'publish',
-          'limit' => 6, // Limit to 6 products
-          'orderby' => 'meta_value_num',
-          'order' => 'DESC',
-          'meta_key' => 'total_sales', // Sort by total sales
-        ]);
-        if (!empty($products) && !is_wp_error($products)) :
-          foreach ($products as $product) :
-        ?>
-            <div class="otw-search-results-product-item">
-              <a href="<?php echo $product->get_permalink(); ?>">
-                <?php
-                echo $product->get_image();
-                ?>
-                <div class="otw-search-results-product-item-content">
-                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                  <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
-                </div>
-              </a>
-              <div class="otw-search-results-product-item-popup">
-                <?php echo $product->get_image(); ?>
-                <div class="otw-search-results-product-item-content">
-                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                </div>
-                <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
-              </div>
-            </div>
-        <?php
-          endforeach;
-        endif;
-        ?>
-      </div>
-    </div>
-    <!-- End of Best Seller Area -->
-
-    <!-- Recently Viewed -->
-    <?php
-    // Fetch recently viewed product IDs
-    $recently_viewed = $this->get_recently_viewed_product_ids();
-
-    // Fetch recently viewed products
-    $recently_viewed_products = wc_get_products(array(
-      'include' => $recently_viewed,
-      'limit' => 6, // Limit to 6 products
-    ));
-    ?>
-    <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:25%;">
-      <span class="otw-search-results-title"><?php echo __('Recently Viewed', 'otwsearch'); ?></span>
-
-      <?php
-      if (!empty($recently_viewed_products) && !is_wp_error($recently_viewed_products)) :
-      ?>
-        <div class="otw-search-results-products-area-content">
-          <?php foreach ($recently_viewed_products as $product) : ?>
-            <div class="otw-search-results-product-item">
-              <a href="<?php echo $product->get_permalink(); ?>">
-                <?php echo $product->get_image(); ?>
-                <div class="otw-search-results-product-item-content">
-                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                  <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
-                </div>
-              </a>
-              <div class="otw-search-results-product-item-popup">
-                <?php echo $product->get_image(); ?>
-                <div class="otw-search-results-product-item-content">
-                  <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
-                  <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
-                </div>
-                <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
-              </div>
-            </div>
-          <?php endforeach; ?>
+        <!-- Categories Area -->
+        <div class="otw-search-results-category-area" style="--col-width:15%;">
+          <span class="otw-search-results-title"><?php echo __('Categories', 'otwsearch'); ?></span>
+          <ul>
+            <?php foreach ($categories as $category) : ?>
+              <li><a href="<?php echo get_term_link($category); ?>"><?php echo __($category->name, 'otwsearch'); ?></a></li>
+            <?php endforeach; ?>
+          </ul>
         </div>
       <?php
       else :
-        echo __('No Products Found', 'otwsearch');
-      endif;
-
       ?>
+        <div class="otw-search-results-category-area">
+          <span class="otw-search-results-title"><?php echo __('Categories', 'otwsearch'); ?></span>
+          <span>
+            <?php echo __('No Category found with search term', 'otwsearch'); ?>
+          </span>
+        </div>
+      <?php
+      endif;
+    endif;
 
-    </div>
-    <!-- End of Recently Viewed -->
+    if ('yes' === $show_products) :
+      // Output HTML for products
+      if (!empty($products) && !is_wp_error($products)) :
+      ?>
+        <!-- Products Area -->
+        <div class="otw-search-results-products-area" style="<?php if ('yes' === $show_products && 'yes' === $show_recentlyviewed) : echo '--col-width:35%;';
+                                                              else : echo '--col-width:60%;';
+                                                              endif; ?>">
+          <span class="otw-search-results-title">
+            <?php echo __('Products', 'otwsearch'); ?>
+          </span>
+          <div class="otw-search-results-products-area-content product">
+            <?php foreach ($products as $product) : ?>
+              <div class="otw-search-results-product-item">
+                <a href="<?php echo $product->get_permalink(); ?>">
+                  <?php
+                  echo $product->get_image();
+                  ?>
+                  <div class="otw-search-results-product-item-content">
+                    <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                    <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                    <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
+
+                  </div>
+                </a>
+                <div class="otw-search-results-product-item-popup">
+                  <?php echo $product->get_image(); ?>
+                  <div class="otw-search-results-product-item-content">
+                    <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                    <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                  </div>
+                  <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+          <?php
+          // Output HTML for "View all products" link with the total product count
+          echo '<a href="' . home_url('/?s=' . $search_term . '&post_type=product&dgwt_wcas=1') . '" class="text-center">';
+          printf(_n('View all product (%s)', 'View all products (%s)', $total_products_count, 'otwsearch'), number_format_i18n($total_products_count));
+          echo '</a>';
+          ?>
+        </div>
+      <?php
+      else :
+      ?>
+        <div class="otw-search-results-products-area" style="<?php if ('yes' === $show_products && 'yes' === $show_recentlyviewed) : echo '--col-width:35%;';
+                                                              else : echo '--col-width:60%;';
+                                                              endif; ?>">
+          <span class="otw-search-results-title">
+            <?php echo __('Products', 'otwsearch'); ?>
+          </span>
+          <?php
+          echo __('No Products Found', 'otwsearch');
+          ?>
+        </div>
+      <?php
+      endif;
+    endif;
+
+    if ('yes' === $show_bestselling) :
+      ?>
+      <!-- Best Seller Area -->
+      <div class="otw-search-best-seller-area" style="--col-width:25%;">
+        <span class="otw-search-results-title">
+          <?php echo __('Best Sellers', 'otwsearch'); ?>
+        </span>
+
+        <div class="otw-search-results-products-area-content">
+          <?php
+          // Fetch WooCommerce products
+          $products = wc_get_products([
+            'status' => 'publish',
+            'limit' => 6, // Limit to 6 products
+            'orderby' => 'meta_value_num',
+            'order' => 'DESC',
+            'meta_key' => 'total_sales', // Sort by total sales
+          ]);
+          if (!empty($products) && !is_wp_error($products)) :
+            foreach ($products as $product) :
+          ?>
+              <div class="otw-search-results-product-item">
+                <a href="<?php echo $product->get_permalink(); ?>">
+                  <?php
+                  echo $product->get_image();
+                  ?>
+                  <div class="otw-search-results-product-item-content">
+                    <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                    <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                    <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
+                  </div>
+                </a>
+                <div class="otw-search-results-product-item-popup">
+                  <?php echo $product->get_image(); ?>
+                  <div class="otw-search-results-product-item-content">
+                    <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                    <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                  </div>
+                  <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
+                </div>
+              </div>
+          <?php
+            endforeach;
+          endif;
+          ?>
+        </div>
+      </div>
+
+      <!-- End of Best Seller Area -->
+    <?php
+    endif;
+    ?>
+
+    <!-- Recently Viewed -->
+    <?php
+    if ('yes' === $show_recentlyviewed) :
+      // Fetch recently viewed product IDs
+      $recently_viewed = $this->get_recently_viewed_product_ids();
+
+      // Fetch recently viewed products
+      $recently_viewed_products = wc_get_products(array(
+        'include' => $recently_viewed,
+        'limit' => 6, // Limit to 6 products
+      ));
+    ?>
+      <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:25%;">
+        <span class="otw-search-results-title"><?php echo __('Recently Viewed', 'otwsearch'); ?></span>
+
+        <?php
+        if (!empty($recently_viewed_products) && !is_wp_error($recently_viewed_products)) :
+        ?>
+          <div class="otw-search-results-products-area-content">
+            <?php foreach ($recently_viewed_products as $product) : ?>
+              <div class="otw-search-results-product-item">
+                <a href="<?php echo $product->get_permalink(); ?>">
+                  <?php echo $product->get_image(); ?>
+                  <div class="otw-search-results-product-item-content">
+                    <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                    <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                    <span class="otw-search-results-product-item-link desktop-hidden"><?php echo __('Buy Now', 'otwsearch'); ?></span>
+                  </div>
+                </a>
+                <div class="otw-search-results-product-item-popup">
+                  <?php echo $product->get_image(); ?>
+                  <div class="otw-search-results-product-item-content">
+                    <span class="otw-search-results-product-item-title"><?php echo $product->get_name(); ?></span>
+                    <span class="otw-search-results-product-item-price"><?php echo $product->get_price_html(); ?></span>
+                  </div>
+                  <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php
+        else :
+          echo __('No Products Found', 'otwsearch');
+        endif;
+
+        ?>
+
+      </div>
+      <!-- End of Recently Viewed -->
 
 <?php
-
+    endif;
     // Output HTML
     $output = ob_get_clean();
     echo $output;

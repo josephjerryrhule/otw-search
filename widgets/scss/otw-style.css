@@ -114,8 +114,8 @@
 }
 
 .otw-search-results-container > div {
-  flex: 1 0 var(--col-width);
-  max-width: var(--col-width);
+  flex: 1 0 calc(var(--col-width) - var(--gap));
+  max-width: calc(var(--col-width) - var(--gap));
 }
 
 .otw-search-results-container::-webkit-scrollbar {
