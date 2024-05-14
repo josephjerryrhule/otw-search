@@ -144,7 +144,7 @@ class search extends Widget_Base
     $show_recentlyviewed = $settings['show_recentlyviewed'];
 ?>
     <style>
-      * {
+      .otw-search-parent-container {
         --e-global-otw-color-accent: <?php echo $color; ?>
       }
     </style>

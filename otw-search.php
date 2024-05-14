@@ -381,37 +381,41 @@ final class otw_search
   {
 
     $recently_viewed_ids = isset($_COOKIE['recently_viewed']) ? json_decode(stripslashes($_COOKIE['recently_viewed']), true) : array();
-
-    // Fetch recently viewed products based on their IDs
-    $recently_viewed_products = wc_get_products(array(
-      'include' => $recently_viewed_ids,
-      'limit' => 6,
-    ));
-
     // Initialize an empty string to store the HTML markup
     $recently_viewed_html = '';
 
-    // Loop through the recently viewed products and generate HTML markup for each product
-    foreach ($recently_viewed_products as $product) {
-      // Generate HTML markup for the product
-      $recently_viewed_html .= '<div class="otw-search-results-product-item">';
-      $recently_viewed_html .= '<a href="' . $product->get_permalink() . '">';
-      $recently_viewed_html .= $product->get_image();
-      $recently_viewed_html .= '<div class="otw-search-results-product-item-content">';
-      $recently_viewed_html .= '<span class="otw-search-results-product-item-title">' . $product->get_name() . '</span>';
-      $recently_viewed_html .= '<span class="otw-search-results-product-item-price">' . $product->get_price_html() . '</span>';
-      $recently_viewed_html .= '<span class="otw-search-results-product-item-link desktop-hidden">' . __('Buy Now', 'otwsearch') . '</span>';
-      $recently_viewed_html .= '</div></a>';
-      $recently_viewed_html .= '<div class="otw-search-results-product-item-popup">';
-      $recently_viewed_html .= $product->get_image();
-      $recently_viewed_html .= '<div class="otw-search-results-product-item-content">';
-      $recently_viewed_html .= '<span class="otw-search-results-product-item-title">' . $product->get_name() . '</span>';
-      $recently_viewed_html .= '<span class="otw-search-results-product-item-price">' . $product->get_price_html() . '</span>';
-      $recently_viewed_html .= '</div>';
-      $recently_viewed_html .= '<a class="otw-search-results-product-item-link" href="' . $product->get_permalink() . '">' . __('Buy Now', 'otwsearch') . '</a>';
-      $recently_viewed_html .= '</div>';
-      $recently_viewed_html .= '</div>';
-    }
+    if ($recently_viewed_ids) :
+      // Fetch recently viewed products based on their IDs
+      $recently_viewed_products = wc_get_products(array(
+        'include' => $recently_viewed_ids,
+        'limit' => 6,
+      ));
+
+
+      // Loop through the recently viewed products and generate HTML markup for each product
+      foreach ($recently_viewed_products as $product) {
+        // Generate HTML markup for the product
+        $recently_viewed_html .= '<div class="otw-search-results-product-item">';
+        $recently_viewed_html .= '<a href="' . $product->get_permalink() . '">';
+        $recently_viewed_html .= $product->get_image();
+        $recently_viewed_html .= '<div class="otw-search-results-product-item-content">';
+        $recently_viewed_html .= '<span class="otw-search-results-product-item-title">' . $product->get_name() . '</span>';
+        $recently_viewed_html .= '<span class="otw-search-results-product-item-price">' . $product->get_price_html() . '</span>';
+        $recently_viewed_html .= '<span class="otw-search-results-product-item-link desktop-hidden">' . __('Buy Now', 'otwsearch') . '</span>';
+        $recently_viewed_html .= '</div></a>';
+        $recently_viewed_html .= '<div class="otw-search-results-product-item-popup">';
+        $recently_viewed_html .= $product->get_image();
+        $recently_viewed_html .= '<div class="otw-search-results-product-item-content">';
+        $recently_viewed_html .= '<span class="otw-search-results-product-item-title">' . $product->get_name() . '</span>';
+        $recently_viewed_html .= '<span class="otw-search-results-product-item-price">' . $product->get_price_html() . '</span>';
+        $recently_viewed_html .= '</div>';
+        $recently_viewed_html .= '<a class="otw-search-results-product-item-link" href="' . $product->get_permalink() . '">' . __('Buy Now', 'otwsearch') . '</a>';
+        $recently_viewed_html .= '</div>';
+        $recently_viewed_html .= '</div>';
+      }
+    else :
+      $recently_viewed_html .= '<span>' . __('No Recently Viewed Products', 'otwsearch') . '</span>';
+    endif;
 
     // Send the HTML markup as a success response
     wp_send_json_success($recently_viewed_html);

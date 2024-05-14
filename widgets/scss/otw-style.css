@@ -113,6 +113,11 @@
   height: 100%;
 }
 
+.otw-search-results-container > div {
+  flex: 1 0 var(--col-width);
+  max-width: var(--col-width);
+}
+
 .otw-search-results-container::-webkit-scrollbar {
   width: 5px;
 }
@@ -122,7 +127,7 @@
 }
 
 .otw-search-results-container::-webkit-scrollbar-thumb {
-  background-color: #e16f19;
+  background-color: var(--e-global-otw-color-accent);
   outline: 1px solid slategrey;
 }
 
@@ -133,22 +138,6 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.otw-search-results-category-area {
-  flex: 1 0 var(--col-width, 15%);
-  max-width: var(--col-width, 15%);
-}
-
-.otw-search-results-products-area {
-  flex: 1 0 var(--col-width, 60%);
-  max-width: var(--col-width, 60%);
-}
-
-.otw-search-results-viewed-area,
-.otw-search-best-seller-area-content {
-  flex: 1 0 var(--col-width, 25%);
-  max-width: var(--col-width, 25%);
 }
 
 .otw-search-results-title {
