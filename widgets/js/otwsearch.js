@@ -1,12 +1,43 @@
 jQuery(document).ready(function ($) {
+  // Function to load search contents when the search icon is clicked
+  function loadSearchContents() {
+    // Show loading indicator
+    $(".otw-search-results-container").addClass("loading");
+
+    // Load search contents via AJAX
+    $.ajax({
+      url: ajax_data.ajax_url,
+      type: "POST",
+      data: {
+        action: "custom_search_action",
+        search_term: "",
+      },
+      success: function (response) {
+        // Hide loading indicator
+        $(".otw-search-results-container").removeClass("loading");
+
+        // Update categories and products area with the AJAX response
+        $(".otw-search-results-container").html(response);
+      },
+      error: function (error) {
+        console.log(error);
+      },
+    });
+  }
+
+  // Load search contents when the search icon is clicked
   $(".otw-search-icon").on("click", function () {
     $(".otw-search-parent-container").addClass("open");
+    loadSearchContents();
   });
 
+  // Close search when close icon is clicked
   $(".otw-search-close-icon").on("click", function () {
     $(".otw-search-parent-container").removeClass("open");
   });
+});
 
+jQuery(document).ready(function ($) {
   $('.otw-search-input-container input[type="search"]').on(
     "input",
     function () {
