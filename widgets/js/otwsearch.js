@@ -89,7 +89,6 @@ jQuery(document).ready(function ($) {
 
   // Example: Listen for click events on product links and add them to recently viewed
   $(".product").on("click", function (e) {
-    e.preventDefault();
     var productId = $(this).data("product-id"); // Get product ID from data attribute
     addToRecentlyViewed(productId); // Add product to recently viewed
   });
