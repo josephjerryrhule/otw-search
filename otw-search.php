@@ -90,19 +90,6 @@ final class otw_search
       'status' => 'publish',
       'limit' => 12, // Limit to 12 products
       's' => $search_term, // Search term
-      'meta_query' => array(
-        'relation' => 'OR', // Match either SKU or title
-        array(
-          'key' => '_sku',
-          'value' => $search_term,
-          'compare' => 'LIKE'
-        ),
-        array(
-          'key' => 'post_title', // Product title meta key
-          'value' => $search_term,
-          'compare' => 'LIKE'
-        )
-      )
     );
 
     // Fetch WooCommerce products with search term filter and SKU search
