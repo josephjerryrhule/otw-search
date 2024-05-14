@@ -34,6 +34,7 @@ jQuery(document).ready(function ($) {
   // Close search when close icon is clicked
   $(".otw-search-close-icon").on("click", function () {
     $(".otw-search-parent-container").removeClass("open");
+    $(".otw-search-results-container").empty(); // Empty search results container
   });
 });
 
