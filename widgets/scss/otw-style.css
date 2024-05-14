@@ -96,7 +96,7 @@
 }
 
 .otw-search-input-container input:focus {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .otw-search-results-container {
