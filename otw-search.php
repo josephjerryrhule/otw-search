@@ -385,7 +385,7 @@ final class otw_search
     // Fetch recently viewed products based on their IDs
     $recently_viewed_products = wc_get_products(array(
       'include' => $recently_viewed_ids,
-      'limit' => -1,
+      'limit' => 6,
     ));
 
     // Initialize an empty string to store the HTML markup
