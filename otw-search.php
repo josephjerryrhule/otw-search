@@ -87,13 +87,27 @@ final class otw_search
 
 
     $args = array(
-      'status'     => 'publish',
-      'limit'      => 12, // Limit to 12 products
-      's'          => $search_term, // Search term
+      'status' => 'publish',
+      'limit' => 12, // Limit to 12 products
+      's' => $search_term, // Search term
+      'meta_query' => array(
+        'relation' => 'OR', // Match either SKU or title
+        array(
+          'key' => '_sku',
+          'value' => $search_term,
+          'compare' => 'LIKE'
+        ),
+        array(
+          'key' => 'post_title', // Product title meta key
+          'value' => $search_term,
+          'compare' => 'LIKE'
+        )
+      )
     );
 
     // Fetch WooCommerce products with search term filter and SKU search
     $products = wc_get_products($args);
+
 
     // Fetch product categories associated with the matching products
     // Fetch WooCommerce product categories with search term filter
