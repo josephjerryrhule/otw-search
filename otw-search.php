@@ -86,14 +86,35 @@ final class otw_search
     $show_recentlyviewed = $settings['show_recentlyviewed'];
 
 
-    $args = array(
-      'status' => 'publish',
-      'limit' => 12, // Limit to 12 products
-      's' => $search_term, // Search term
+    // Perform separate queries to search by title and SKU
+    $args_title = array(
+      'post_type'      => 'product',
+      'posts_per_page' => 12,
+      's'              => $search_term,
     );
 
-    // Fetch WooCommerce products with search term filter and SKU search
-    $products = wc_get_products($args);
+    $args_sku = array(
+      'post_type'      => 'product',
+      'posts_per_page' => 12,
+      'meta_query'     => array(
+        array(
+          'key'   => '_sku',
+          'value' => $search_term,
+          'compare' => 'LIKE',
+        ),
+      ),
+    );
+
+    // Query products by title
+    $products_title = new \WP_Query($args_title);
+
+    // Query products by SKU
+    $products_sku = new \WP_Query($args_sku);
+
+    // Merge results from both queries
+    $products = new \WP_Query();
+    $products->posts = array_merge($products_title->posts, $products_sku->posts);
+    $products->post_count = count($products->posts);
 
 
     // Fetch product categories associated with the matching products
@@ -135,7 +156,7 @@ final class otw_search
 
     if ('yes' === $show_products) :
       // Output HTML for products
-      if (!empty($products) && !is_wp_error($products)) :
+      if ($products->have_posts()) :
       ?>
         <!-- Products Area -->
         <div class="otw-search-results-products-area" style="<?php if ('yes' === $show_products && 'yes' === $show_recentlyviewed) : echo '--col-width:35%;';
@@ -145,7 +166,10 @@ final class otw_search
             <?php echo __('Products', 'otwsearch'); ?>
           </span>
           <div class="otw-search-results-products-area-content product">
-            <?php foreach ($products as $product) : ?>
+            <?php while ($products->have_posts()) :
+              $products->the_post();
+              global $product;
+            ?>
               <div class="otw-search-results-product-item">
                 <a href="<?php echo $product->get_permalink(); ?>">
                   <?php
@@ -167,13 +191,24 @@ final class otw_search
                   <a class="otw-search-results-product-item-link" href="<?php echo $product->get_permalink(); ?>"><?php echo __('Buy Now', 'otwsearch'); ?></a>
                 </div>
               </div>
-            <?php endforeach; ?>
+            <?php endwhile;
+            wp_reset_postdata(); ?>
           </div>
           <?php
-          // Output HTML for "View all products" link with the total product count
-          echo '<a href="' . home_url('/?s=' . $search_term . '&post_type=product&dgwt_wcas=1') . '" class="text-center">';
-          printf(_n('View all product (%s)', 'View all products (%s)', $total_products_count, 'otwsearch'), number_format_i18n($total_products_count));
-          echo '</a>';
+          if (!empty($search_term)) :
+            // Output HTML for "View all products" link with the total product count
+            echo '<a href="' . home_url('/?s=' . $search_term . '&post_type=product&dgwt_wcas=1') . '" class="text-center">';
+            printf(_n('View all product (%s)', 'View all products (%s)', $products->post_count, 'otwsearch'), number_format_i18n($products->post_count));
+            echo '</a>';
+          else :
+            // Get the total number of products
+            $total_products = wp_count_posts('product')->publish;
+
+            // Output HTML for "View all products" link with the total product count
+            echo '<a href="' . home_url('/?post_type=product') . '" class="text-center">';
+            printf(_n('View all product (%s)', 'View all products (%s)', $total_products, 'otwsearch'), number_format_i18n($total_products));
+            echo '</a>';
+          endif;
           ?>
         </div>
       <?php
