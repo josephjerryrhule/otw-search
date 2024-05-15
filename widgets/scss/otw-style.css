@@ -25,10 +25,11 @@
 }
 
 .otw-search-content-container {
+  --otw-search-spacing: max(1vw, 1rem);
   max-width: 1440px;
   width: 100%;
   background-color: white;
-  padding: 50px;
+  padding: var(--otw-search-spacing);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -100,10 +101,9 @@
 }
 
 .otw-search-results-container {
-  --gap: max(2vw, 1rem);
   width: 100%;
   display: flex;
-  gap: var(--gap);
+  gap: var(--otw-search-spacing);
   align-items: start;
   justify-content: space-between;
   padding: 30px 0;
@@ -114,8 +114,8 @@
 }
 
 .otw-search-results-container > div {
-  flex: 1 0 calc(var(--col-width) - var(--gap));
-  max-width: calc(var(--col-width) - var(--gap));
+  flex: 1 0 calc(var(--col-width) - var(--otw-search-spacing));
+  max-width: calc(var(--col-width) - var(--otw-search-spacing));
 }
 
 .otw-search-results-container::-webkit-scrollbar {
@@ -144,6 +144,10 @@
   font-weight: bold;
   padding-left: 1em;
   border-left: 3px solid var(--e-global-otw-color-accent);
+}
+
+.otw-search-results-category-area {
+  font-size: 14px;
 }
 
 .otw-search-results-category-area ul {
@@ -419,7 +423,7 @@
 @media (min-width: 1025px) {
   .otw-search-results-container > div:not(:last-of-type) {
     border-right: 1px solid;
-    padding-right: var(--gap);
+    padding-right: var(--otw-search-spacing);
   }
 }
 

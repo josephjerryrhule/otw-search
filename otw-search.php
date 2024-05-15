@@ -148,7 +148,7 @@ final class otw_search
       if (!empty($categories)) :
 ?>
         <!-- Categories Area -->
-        <div class="otw-search-results-category-area" style="--col-width:15%;">
+        <div class="otw-search-results-category-area" style="--col-width:20%;">
           <span class="otw-search-results-title"><?php echo __('Categories', 'otwsearch'); ?></span>
           <ul>
             <?php foreach ($categories as $category) : ?>
@@ -174,7 +174,7 @@ final class otw_search
       if ($products->have_posts()) :
       ?>
         <!-- Products Area -->
-        <div class="otw-search-results-products-area" style="<?php if ('yes' === $show_products && 'yes' === $show_recentlyviewed) : echo '--col-width:35%;';
+        <div class="otw-search-results-products-area" style="<?php if ('yes' === $show_products && 'yes' === $show_recentlyviewed) : echo '--col-width:40%;';
                                                               else : echo '--col-width:60%;';
                                                               endif; ?>">
           <span class="otw-search-results-title">
@@ -277,7 +277,7 @@ final class otw_search
       <?php
       else :
       ?>
-        <div class="otw-search-results-products-area" style="<?php if ('yes' === $show_products && 'yes' === $show_recentlyviewed) : echo '--col-width:35%;';
+        <div class="otw-search-results-products-area" style="<?php if ('yes' === $show_products && 'yes' === $show_recentlyviewed) : echo '--col-width:40%;';
                                                               else : echo '--col-width:60%;';
                                                               endif; ?>">
           <span class="otw-search-results-title">
@@ -294,7 +294,7 @@ final class otw_search
     if ('yes' === $show_bestselling) :
       ?>
       <!-- Best Seller Area -->
-      <div class="otw-search-best-seller-area" style="--col-width:25%;">
+      <div class="otw-search-best-seller-area" style="--col-width:20%;">
         <span class="otw-search-results-title">
           <?php echo __('Best Sellers', 'otwsearch'); ?>
         </span>
@@ -357,7 +357,7 @@ final class otw_search
           'limit' => 6, // Limit to 6 products
         ));
     ?>
-        <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:25%;">
+        <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:20%;">
           <span class="otw-search-results-title"><?php echo __('Recently Viewed', 'otwsearch'); ?></span>
 
           <?php
@@ -390,7 +390,7 @@ final class otw_search
           endif;
         else :
           ?>
-          <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:25%;">
+          <div class="otw-search-best-seller-area otw-search-recently-viewed-area" style="--col-width:20%;">
             <span class="otw-search-results-title"><?php echo __('Recently Viewed', 'otwsearch'); ?></span>
             <span><?php echo __('No Recently Viewed Products', 'otwsearch'); ?></span>
           </div>
