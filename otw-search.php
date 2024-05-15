@@ -72,9 +72,6 @@ final class otw_search
   public function custom_search_callback()
   {
     $search_term = sanitize_text_field($_POST['search_term']);
-    // Count the total number of products matching the search term
-    $total_products_count = $this->get_total_product_count($search_term);
-
 
     //Retrive settings from WordPress options table
     $settings = get_option('otwsearch_settings');
@@ -347,22 +344,6 @@ final class otw_search
     wp_die();
   }
 
-  // Function to retrieve the total count of products matching the search term
-  private function get_total_product_count($search_term)
-  {
-    $args = array(
-      'status'     => 'publish',
-      's'          => $search_term, // Search term filter
-      'return'     => 'ids',
-      'limit' => -1, // Return only product IDs
-    );
-
-    // Fetch WooCommerce products with search term filter and return only IDs
-    $product_ids = wc_get_products($args);
-
-    // Return the count of retrieved product IDs
-    return count($product_ids);
-  }
   // Function to add indexes to WooCommerce database tables
   public function add_custom_indexes()
   {
