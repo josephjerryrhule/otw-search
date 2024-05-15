@@ -17,6 +17,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+
 final class otw_search
 {
   private static $_instance = null;
@@ -87,7 +88,7 @@ final class otw_search
     $args_title = array(
       'post_type'      => 'product',
       'posts_per_page' => 12,
-      's' => $search_term,
+      's'              => $search_term,
     );
 
     $args_sku = array(
@@ -103,14 +104,31 @@ final class otw_search
     );
 
     // Query products by title
+
+
+    add_filter('posts_search', [$this, 'ajax_posts_search'], 10, 2);
     $products_title = new \WP_Query($args_title);
+    remove_filter('posts_where', [$this, 'ajax_posts_search']);
 
     // Query products by SKU
     $products_sku = new \WP_Query($args_sku);
 
     // Merge results from both queries
     $products = new \WP_Query();
-    $products->posts = array_merge($products_title->posts, $products_sku->posts);
+    $title_search_ids = array();
+    if ($products_title && is_array($products_title->posts) && count($products_title->posts) >= 1) {
+      foreach ($products_title->posts as $single_post) {
+        $title_search_ids[$single_post->ID] = $single_post;
+      }
+    }
+    if ($products_sku && is_array($products_sku->posts) && count($products_sku->posts) >= 1 && $title_search_ids) {
+      foreach ($products_sku->posts as $single_post) {
+        if (array_key_exists($single_post->ID, $title_search_ids)) {
+          unset($title_search_ids[$single_post->ID]);
+        }
+      }
+    }
+    $products->posts = array_merge($title_search_ids, $products_sku->posts);
     $products->post_count = count($products->posts);
 
 
@@ -193,9 +211,19 @@ final class otw_search
           </div>
           <?php
           if (!empty($search_term)) :
+            // Perform separate query to count the number of products matching the search term
+            $args_count = array(
+              'post_type'      => 'product',
+              'posts_per_page' => -1, // Retrieve all products
+              's'              => $search_term,
+            );
+
+            $count_query = new \WP_Query($args_count);
+            $total_products_count = $count_query->found_posts;
+
             // Output HTML for "View all products" link with the total product count
             echo '<a href="' . home_url('/?s=' . $search_term . '&post_type=product&dgwt_wcas=1') . '" class="text-center">';
-            printf(_n('View all product (%s)', 'View all products (%s)', $products->post_count, 'otwsearch'), number_format_i18n($products->post_count));
+            printf(_n('View all product (%s)', 'View all products (%s)', $total_products_count, 'otwsearch'), number_format_i18n($total_products_count));
             echo '</a>';
           else :
             // Get the total number of products
@@ -343,6 +371,19 @@ final class otw_search
 
     wp_die();
   }
+
+
+
+  public function ajax_posts_search($search, $wp_query)
+  {
+    global $wpdb;
+    if ($wp_query->get('s')) {
+      $search = ' AND ' . $wpdb->posts . '.post_title LIKE "%' . $wp_query->get('s') . '%"';
+    }
+
+    return $search;
+  }
+
 
   // Function to add indexes to WooCommerce database tables
   public function add_custom_indexes()
