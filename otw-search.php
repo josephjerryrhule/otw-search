@@ -87,7 +87,7 @@ final class otw_search
     $args_title = array(
       'post_type'      => 'product',
       'posts_per_page' => 12,
-      's'              => $search_term,
+      's' => $search_term,
     );
 
     $args_sku = array(

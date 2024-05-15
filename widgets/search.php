@@ -12,8 +12,6 @@ namespace OTWSEARCH\ElementorWidgets\Widgets;
 
 use Elementor\Widget_Base;
 
-use function OTWSEARCH\ElementorWidgets\get_recently_viewed_product_ids;
-
 class search extends Widget_Base
 {
 
