@@ -211,19 +211,57 @@ final class otw_search
           </div>
           <?php
           if (!empty($search_term)) :
-            // Perform separate query to count the number of products matching the search term
-            $args_count = array(
+            // Perform separate queries to search by title and SKU
+            $args_title_item = array(
               'post_type'      => 'product',
-              'posts_per_page' => -1, // Retrieve all products
+              'posts_per_page' => -1,
               's'              => $search_term,
             );
 
-            $count_query = new \WP_Query($args_count);
-            $total_products_count = $count_query->found_posts;
+            $args_sku_item = array(
+              'post_type'      => 'product',
+              'posts_per_page' => -1,
+              'meta_query'     => array(
+                array(
+                  'key'   => '_sku',
+                  'value' => $search_term,
+                  'compare' => 'LIKE',
+                ),
+              ),
+            );
+
+            // Query products by title
+
+
+            add_filter('posts_search', [$this, 'ajax_posts_search'], 10, 2);
+            $products_title_item = new \WP_Query($args_title_item);
+            remove_filter('posts_where', [$this, 'ajax_posts_search']);
+
+            // Query products by SKU
+            $products_sku_item = new \WP_Query($args_sku_item);
+
+            // Merge results from both queries
+            $products_item = new \WP_Query();
+            $title_search_ids_item = array();
+            if ($products_title_item && is_array($products_title_item->posts) && count($products_title_item->posts) >= 1) {
+              foreach ($products_title_item->posts as $single_post) {
+                $title_search_ids[$single_post->ID] = $single_post;
+              }
+            }
+            if ($products_sku_item && is_array($products_sku_item->posts) && count($products_sku_item->posts) >= 1 && $title_search_ids) {
+              foreach ($products_sku_item->posts as $single_post) {
+                if (array_key_exists($single_post->ID, $title_search_ids)) {
+                  unset($title_search_ids_item[$single_post->ID]);
+                }
+              }
+            }
+            $products_item->posts = array_merge($title_search_ids, $products_sku_item->posts);
+            $products_item->post_count = count($products_item->posts);
+
 
             // Output HTML for "View all products" link with the total product count
             echo '<a href="' . home_url('/?s=' . $search_term . '&post_type=product&dgwt_wcas=1') . '" class="text-center">';
-            printf(_n('View all product (%s)', 'View all products (%s)', $total_products_count, 'otwsearch'), number_format_i18n($total_products_count));
+            printf(_n('View all product (%s)', 'View all products (%s)', $products_item->post_count, 'otwsearch'), number_format_i18n($products_item->post_count));
             echo '</a>';
           else :
             // Get the total number of products
