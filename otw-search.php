@@ -242,19 +242,6 @@ final class otw_search
 
             // Merge results from both queries
             $products_item = new \WP_Query();
-            $title_search_ids_item = array();
-            if ($products_title_item && is_array($products_title_item->posts) && count($products_title_item->posts) >= 1) {
-              foreach ($products_title_item->posts as $single_post) {
-                $title_search_ids[$single_post->ID] = $single_post;
-              }
-            }
-            if ($products_sku_item && is_array($products_sku_item->posts) && count($products_sku_item->posts) >= 1 && $title_search_ids) {
-              foreach ($products_sku_item->posts as $single_post) {
-                if (array_key_exists($single_post->ID, $title_search_ids)) {
-                  unset($title_search_ids_item[$single_post->ID]);
-                }
-              }
-            }
             $products_item->posts = array_merge($title_search_ids, $products_sku_item->posts);
             $products_item->post_count = count($products_item->posts);
 
